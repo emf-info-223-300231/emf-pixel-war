@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import {Table} from "react-bootstrap";
+import {PixelRow} from "./Pixels/PixelRow";
+import {getAllColors} from "./Api/Call";
+
+type colors = {
+    row:number,
+    color:string
+}
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [row,setRow] = useState<React.ReactElement[]>();
+    const [colors,setColors] = useState<any>();
+    useEffect(()=>{
+        setInterval(()=>{
+            getAllColors((data:any)=>setColors(data));
+        },500);
+    },[]);
+
+    useEffect(()=>{
+        let tmp:React.ReactElement[] = [];
+        if(colors !== undefined) {
+            for (let i = 0; i < 64; i++) {
+                tmp[i] = <PixelRow key={"col"+i} row={i} size={colors[i].length} coloring={colors[i]}/>
+            }
+        }
+        setRow(tmp);
+    },[colors]);
+
+    return (
+        <div className="center">
+            <Table>
+                <tbody>
+                    {row?.map((x)=>x)}
+                </tbody>
+            </Table>
+        </div>
+    );
 }
 
 export default App;
