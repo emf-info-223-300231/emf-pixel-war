@@ -5,7 +5,7 @@
 - Une fois cela fait entrer la commande suivante : `npm install` cela ajoutera les librairies nécessaires par rapport au `package.json` 
  **Attention à ne jamais supprimer ce fichier !!!**  
 - Pour instancier l'application en local il faudra execute la commande : `npm start` dans le dossier racine de React
-- Pour pouvoir la déployer dans un environnement production il faut le build, car le projet est en typescript utilisé la commande `npm run build`
+- Pour pouvoir la déployer dans un environnement production il faut le build, car le projet est en typescript il faudra se rendre dans `package.json` et trouver l'option de build
 
 ## Learn More
 
