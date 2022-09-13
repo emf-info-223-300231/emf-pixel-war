@@ -1,0 +1,24 @@
+html,body,#root{
+  height: 100%;
+  margin:0;
+}
+tr,td{
+  padding: 0;
+  border: 0;
+}
+.asd{
+  height: 10px;
+  min-height: 10px;
+  width: 10px;
+  min-width: 10px;
+}
+.center{
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+table{
+  border: 2px solid black;
+  border-spacing: 0;
+}
