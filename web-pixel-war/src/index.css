@@ -21,4 +21,5 @@ tr,td{
 }
 table{
   border: 2px solid black;
+  border-spacing: 0;
 }
