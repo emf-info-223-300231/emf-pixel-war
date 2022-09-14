@@ -4,17 +4,16 @@
  */
 package app.beans;
 
+import jdk.nashorn.internal.objects.annotations.Optimistic;
+import org.eclipse.persistence.annotations.Cache;
+import org.eclipse.persistence.annotations.Noncacheable;
+import org.eclipse.persistence.config.CacheIsolationType;
+import org.eclipse.persistence.config.CacheType;
+
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -44,9 +43,10 @@ public class Pixel implements Serializable {
     private Integer rowPixel;
     @Column(name = "color_pixel")
     private String colorPixel;
+
     @Column(name = "date_modification")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateModification;
+    @Version
+    private Timestamp dateModification;
 
     public Pixel() {
     }
@@ -92,7 +92,7 @@ public class Pixel implements Serializable {
     }
 
     public void setDateModification(Date dateModification) {
-        this.dateModification = dateModification;
+        this.dateModification = (Timestamp) dateModification;
     }
 
     @Override

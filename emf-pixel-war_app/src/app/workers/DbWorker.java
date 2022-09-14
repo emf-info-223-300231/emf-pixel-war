@@ -48,7 +48,7 @@ public class DbWorker implements DbWorkerItf {
   /**
    * Modifier par : Valentino
    * Modification : J'ai fait en sorte que la query n'es pas dans le cache.
-   * @return list de peixels
+   * @return list de pixels
    * @throws MyDBException
    */
   @Override
@@ -99,19 +99,23 @@ public class DbWorker implements DbWorkerItf {
     }
     return p;
   }
-  
+
+  /**
+   * Modifier par : Valentino
+   * Modification : Je supprime le et.rollback car quand le merge ne fonctionne pas cela annule la transaction seul.
+   * Ce n'est pas une OptimisticLockException qui est lever met une autre avec plusieurs je mets donc Exception à la place.
+   * @param p
+   * @throws MyDBException
+   */
   @Override
   public void modifier(Pixel p) throws MyDBException {
     try {
       et.begin();
       em.merge(p);
       et.commit();
-    } catch (OptimisticLockException ex) {
-      et.rollback();
-      throw new MyDBException(SystemLib.getFullMethodName() + ex.getMessage(), "\n concurrence de mise à jour");
     } catch (Exception ex) {
-      et.rollback();
-      throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
+      //et.rollback();
+      throw new MyDBException(SystemLib.getFullMethodName() + ex.getMessage(), "\n concurrence de mise à jour");
     }
   }
   
