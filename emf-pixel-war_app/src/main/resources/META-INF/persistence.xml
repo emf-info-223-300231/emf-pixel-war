@@ -2,7 +2,7 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="emf-pixel-war_appPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>app.beans.Pixel</class>
+    <class>main.java.app.beans.Pixel</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://5.182.248.183:3306/ramalhom_pixelwar?serverTimezone=UTC"/>
       <property name="javax.persistence.jdbc.user" value="ramalhom_pixelwar"/>

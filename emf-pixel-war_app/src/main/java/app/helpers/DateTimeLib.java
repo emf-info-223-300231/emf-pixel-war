@@ -1,4 +1,4 @@
-package app.helpers;
+package main.java.app.helpers;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;

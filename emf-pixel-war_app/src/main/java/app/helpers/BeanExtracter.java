@@ -1,4 +1,4 @@
-package app.helpers;
+package main.java.app.helpers;
 
 /**
  * Interface qui spécifie la forme que doit prendre une méthode d'extraction
