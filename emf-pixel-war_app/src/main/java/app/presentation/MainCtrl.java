@@ -1,5 +1,6 @@
 package main.java.app.presentation;
 
+import javafx.scene.input.MouseButton;
 import main.java.app.exceptions.MyDBException;
 import main.java.app.beans.Pixel;
 
@@ -123,40 +124,51 @@ public class MainCtrl implements Initializable {
         }).start();
     }
 
+    /**
+     * Modification par : Valentino
+     * Modifier : J'ai ajouté de la couleur grâce au click droit de la souris.
+     * @param colIndex
+     * @param rowIndex
+     */
     private void addPane(int colIndex, int rowIndex) {
         Pane pane = new Pane();
         pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         pane.setOnMouseClicked(e -> {
-            Pixel p = findPixel(colIndex, rowIndex);
-            if (p != null) {
-                try {
-                    Color color = colorPicker.getValue();
-                    p.setColorPixel(colorChanelToHex(color.getRed())
-                            + colorChanelToHex(color.getGreen())
-                            + colorChanelToHex(color.getBlue()));
-                } catch (Exception ex) {
-                    JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex.toString());
-                }
-                try {
-                    dbWrk.modifier(p);
-                } catch (MyDBException ex1) {
-                    JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex1.getMessage());
+            if(e.getButton().equals(MouseButton.PRIMARY)) {
+                Pixel p = findPixel(colIndex, rowIndex);
+                if (p != null) {
                     try {
-                        pixels = dbWrk.lirePixels();
-                        draw(pixels);
-                    } catch (MyDBException ex2) {
-                        JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex2.toString());
+                        Color color = colorPicker.getValue();
+                        p.setColorPixel(colorChanelToHex(color.getRed())
+                                + colorChanelToHex(color.getGreen())
+                                + colorChanelToHex(color.getBlue()));
+                    } catch (Exception ex) {
+                        JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex.toString());
                     }
+                    try {
+                        dbWrk.modifier(p);
+                    } catch (MyDBException ex1) {
+                        JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex1.getMessage());
+                        try {
+                            pixels = dbWrk.lirePixels();
+                            draw(pixels);
+                        } catch (MyDBException ex2) {
+                            JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex2.toString());
+                        }
 
+                    }
                 }
+                pane.setBackground(new Background(new BackgroundFill(colorPicker.getValue(), CornerRadii.EMPTY, Insets.EMPTY)));
+            }else{
+                colorPicker.setValue((Color) ((Pane)e.getTarget()).getBackground().getFills().get(0).getFill());
             }
-            pane.setBackground(new Background(new BackgroundFill(colorPicker.getValue(), CornerRadii.EMPTY, Insets.EMPTY)));
         });
         pane.setOnMouseEntered(e -> {
             lblColumn.setText("Colonne : " + colIndex);
             lblRow.setText("Ligne : " + rowIndex);
         });
         gridPixelWar.add(pane, colIndex, rowIndex);
+
     }
 
     private static String colorChanelToHex(double chanelValue) {
