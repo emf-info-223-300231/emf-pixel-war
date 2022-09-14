@@ -3,14 +3,11 @@ package app.workers;
 import app.beans.Pixel;
 import app.exceptions.MyDBException;
 import app.helpers.SystemLib;
+import org.eclipse.persistence.annotations.OptimisticLocking;
+
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.*;
 
 public class DbWorker implements DbWorkerItf {
 
@@ -48,16 +45,22 @@ public class DbWorker implements DbWorkerItf {
     }
   }
 
+  /**
+   * Modifier par : Valentino
+   * Modification : J'ai fait en sorte que la query n'es pas dans le cache.
+   * @return list de peixels
+   * @throws MyDBException
+   */
   @Override
   public List<Pixel> lirePixels() throws MyDBException {
-    List<Pixel> listePersonnes = new ArrayList<>();
+    List<Pixel> listePixels = new ArrayList<>();
     try {
-      Query query = em.createQuery("SELECT p FROM Pixel p");
-      listePersonnes = query.getResultList();
+      Query query = em.createQuery("SELECT p FROM Pixel p").setHint("javax.persistence.cache.storeMode", "REFRESH");
+      listePixels = query.getResultList();
     } catch (Exception ex) {
       throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
     }
-    return listePersonnes;
+    return listePixels;
   }
 
   @Override
