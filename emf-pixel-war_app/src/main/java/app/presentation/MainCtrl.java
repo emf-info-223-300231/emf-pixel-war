@@ -7,6 +7,8 @@ import main.java.app.beans.Pixel;
 import main.java.app.helpers.JfxPopup;
 import main.java.app.workers.DbWorker;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -193,18 +195,19 @@ public class MainCtrl implements Initializable {
      * Modifier par : Valentino
      * Modification : J'ai ajouté le multi-threading et diviser la liste en deux pour que cela soit plus rapide.
      * L'application démarre presque instantanément ou presque.
+     * Modification 2 : Le 4eme Thread permet de verifier l'intégrité du tableau de pixels et d'afficher le dernier quart de pixels.
      * @param pixels tableau de pixels
      */
     public void draw(List<Pixel> pixels) {
         int size = pixels.size();
         new Thread(()->{
-            pixelMaker(pixels.subList(0,(size+1)/4));
+            pixelMaker(Collections.unmodifiableList(pixels.subList(0,(size+1)/4)));
+        }).start();
+         new Thread(()->{
+            pixelMaker(Collections.unmodifiableList(pixels.subList((size+1)/4,(size+1)/2)));
         }).start();
         new Thread(()->{
-            pixelMaker(pixels.subList((size+1)/4,(size+1)/2));
-        });
-        new Thread(()->{
-            pixelMaker(pixels.subList((size+1)/2,size-(size/4)));
+            pixelMaker(Collections.unmodifiableList(pixels.subList((size+1)/2,size-(size/4))));
         }).start();
         new Thread(()->{
             pixelMaker(pixels);
