@@ -17,13 +17,14 @@
         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" BorderPane.alignment="TOP_CENTER">
          <children>
             <ColorPicker fx:id="colorPicker" />
-            <Button mnemonicParsing="false" onAction="#handleRefresh" text="refresh" />
+            <Button mnemonicParsing="false" onAction="#handleRefresh" text="Rafraîchir" />
             <Label fx:id="lblColumn" text="Colonne : " />
             <Label fx:id="lblRow" text="Ligne : " />
             <Label contentDisplay="CENTER" prefHeight="17.0" prefWidth="68.0" text="Module 223" textAlignment="CENTER">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font></Label>
+            <Button mnemonicParsing="false" onAction="#handleOpenImage" text="Ouvrir image" visible="false" />
          </children></VBox>
     </right>
 </BorderPane>

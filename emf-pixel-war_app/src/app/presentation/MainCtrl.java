@@ -10,6 +10,9 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import app.workers.DbWorkerItf;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,6 +33,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -50,6 +56,7 @@ public class MainCtrl implements Initializable {
     private Label lblColumn;
     @FXML
     private Label lblRow;
+    private Stage stage;
 
     /*
    * INTIALISATION DE LA VUE
@@ -73,22 +80,19 @@ public class MainCtrl implements Initializable {
             System.exit(1);
         }
 
-        try {
-            if(dbWrk != null) {
-                pixels = dbWrk.lirePixels();
-                draw(pixels);
-            }else{
-                JfxPopup.displayError("ERREUR", null, "Worker null");
-            }
-        } catch (MyDBException ex) {
-            JfxPopup.displayError("ERREUR", null, ex.getMessage());
+        if (dbWrk != null) {
+            refresh();
+        } else {
+            JfxPopup.displayError("ERREUR", null, "Worker null");
         }
+
     }
 
     /**
-     * Modifier par : Valentino
-     * Modification : J'ai réduit le temps d'initialisation de 238ms à 4ms grâce au multi-threading.
-     * Mesure effectuer avec System.nanoTime() et profiler de intellij :)
+     * Modifier par : Valentino Modification : J'ai réduit le temps
+     * d'initialisation de 238ms à 4ms grâce au multi-threading. Mesure
+     * effectuer avec System.nanoTime() et profiler de intellij :)
+     *
      * @version 1.0.1
      */
     private void initGrid() {
@@ -115,7 +119,7 @@ public class MainCtrl implements Initializable {
             }
         }).start();
 
-        new Thread(()->{
+        new Thread(() -> {
             for (int i = 0; i < numCols; i++) {
                 for (int j = 0; j < numRows; j++) {
                     addPane(i, j);
@@ -130,28 +134,19 @@ public class MainCtrl implements Initializable {
         pane.setOnMouseClicked(e -> {
             Pixel p = findPixel(colIndex, rowIndex);
             if (p != null) {
-                try {
-                    Color color = colorPicker.getValue();
-                    p.setColorPixel(colorChanelToHex(color.getRed())
-                            + colorChanelToHex(color.getGreen())
-                            + colorChanelToHex(color.getBlue()));
-                } catch (Exception ex) {
-                    JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex.toString());
-                }
+                Color color = colorPicker.getValue();
+                p.setColorPixel(colorChanelToHex(color.getRed())
+                        + colorChanelToHex(color.getGreen())
+                        + colorChanelToHex(color.getBlue()));
                 try {
                     dbWrk.modifier(p);
+                    pane.setBackground(new Background(new BackgroundFill(colorPicker.getValue(), CornerRadii.EMPTY, Insets.EMPTY)));
                 } catch (MyDBException ex1) {
                     JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex1.toString());
-                    try {
-                        pixels = dbWrk.lirePixels();
-                        draw(pixels);
-                    } catch (MyDBException ex2) {
-                        JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex2.toString());
-                    }
-
+                    refresh();
                 }
             }
-            pane.setBackground(new Background(new BackgroundFill(colorPicker.getValue(), CornerRadii.EMPTY, Insets.EMPTY)));
+
         });
         pane.setOnMouseEntered(e -> {
             lblColumn.setText("Colonne : " + colIndex);
@@ -179,24 +174,26 @@ public class MainCtrl implements Initializable {
     }
 
     /**
-     * Modifier par : Valentino
-     * Modification : J'ai ajouté le multi-threading et diviser la liste en deux pour que cela soit plus rapide.
-     * L'application démarre presque instantanément ou presque.
+     * Modifier par : Valentino Modification : J'ai ajouté le multi-threading et
+     * diviser la liste en deux pour que cela soit plus rapide. L'application
+     * démarre presque instantanément ou presque.
+     *
      * @param pixels tableau de pixels
      */
     public void draw(List<Pixel> pixels) {
         int size = pixels.size();
-        new Thread(()->{
-            pixelMaker(pixels.subList(0,(size+1)/2));
+        new Thread(() -> {
+            pixelMaker(pixels.subList(0, (size + 1) / 2));
         }).start();
-        new Thread(()->{
-            pixelMaker(pixels.subList((size+1)/2,size));
+        new Thread(() -> {
+            pixelMaker(pixels.subList((size + 1) / 2, size));
         }).start();
     }
 
     /**
-     * Ajouter par : Valentino
-     * Ajout : Je crée cette méthode pour ne pas avoir du code à double.
+     * Ajouter par : Valentino Ajout : Je crée cette méthode pour ne pas avoir
+     * du code à double.
+     *
      * @param p2
      */
     private void pixelMaker(List<Pixel> p2) {
@@ -237,14 +234,56 @@ public class MainCtrl implements Initializable {
         Platform.exit();
     }
 
-    @FXML
-    private void handleRefresh(ActionEvent event) {
+    private void refresh() {
         try {
             pixels = dbWrk.lirePixels();
             draw(pixels);
         } catch (MyDBException ex) {
             JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex.toString());
         }
+    }
+
+    @FXML
+    private void handleRefresh(ActionEvent event) {
+        refresh();
+    }
+
+    @FXML
+    private void handleOpenImage(ActionEvent event) {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Ouvrir une image");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("All Images", "*.*"),
+                    new FileChooser.ExtensionFilter("JPG", "*.jpg"),
+                    new FileChooser.ExtensionFilter("PNG", "*.png")
+            );
+            File file = fileChooser.showOpenDialog(this.stage);
+            if (file != null) {
+                BufferedImage bufferedImage = ImageIO.read(file);
+                for (int y = 0; y < 64; y++) {
+                    for (int x = 0; x < 96; x++) {
+                        String RGBA = Integer.toHexString(bufferedImage.getRGB(x, y));
+                        RGBA = RGBA.substring(RGBA.length()-6);
+                        Pixel p = findPixel(x, y);
+                        p.setColorPixel(RGBA);
+                        try {
+                            dbWrk.modifier(p);
+                        } catch (MyDBException ex) {
+                            JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex.toString());
+                        }
+                    }
+                }
+                JfxPopup.askInfo("Image enregistrée", "Image enregistrée", "Image enregistrée avec succès !");
+            }
+        } catch (IOException ex) {
+            JfxPopup.displayError("Oups une erreur est survenue !!!", "Oups une erreur est survenue.", ex.toString());
+        }
+
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
 }
