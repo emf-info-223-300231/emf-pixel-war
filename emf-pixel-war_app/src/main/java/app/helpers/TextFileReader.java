@@ -1,4 +1,4 @@
-package app.helpers;
+package main.java.app.helpers;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

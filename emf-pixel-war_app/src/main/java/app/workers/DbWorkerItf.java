@@ -1,7 +1,8 @@
-package app.workers;
+package main.java.app.workers;
 
-import app.beans.Pixel;
-import app.exceptions.MyDBException;
+import main.java.app.exceptions.MyDBException;
+import main.java.app.beans.Pixel;
+
 import java.util.List;
 
 public interface DbWorkerItf {
@@ -16,4 +17,5 @@ public interface DbWorkerItf {
   void modifier( Pixel p ) throws MyDBException;
   void effacer( Pixel p) throws MyDBException;
   long compter() throws MyDBException;
+
 }
