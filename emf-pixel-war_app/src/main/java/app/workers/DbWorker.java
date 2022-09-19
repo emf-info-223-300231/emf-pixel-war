@@ -110,6 +110,7 @@ public class DbWorker implements DbWorkerItf {
   public void modifier(Pixel p) throws MyDBException {
     try {
       et.begin();
+      em.find(Pixel.class, p.getPkPixel(), LockModeType.PESSIMISTIC_WRITE);
       em.merge(p);
       et.commit();
     } catch (Exception ex) {
